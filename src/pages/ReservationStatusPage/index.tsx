@@ -4,7 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Top, Spacing, Border, Button, Text, ListRow } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { getRooms, getReservations, getMyReservations, cancelReservation } from 'pages/remotes';
+import { cancelReservation } from 'pages/remotes';
+import { roomQueries, reservationQueries, myReservationQueries } from 'constants/queryKeys';
 import { EQUIPMENT_LABELS } from 'constants/equipment';
 import type { Equipment } from '_tosslib/server/types';
 import { HOUR_LABELS, TIME_RANGE } from 'constants/time';
@@ -32,15 +33,15 @@ export function ReservationStatusPage() {
     }
   }, [locationState]);
 
-  const { data: rooms = [] } = useQuery({ queryKey: ['rooms'], queryFn: getRooms });
-  const { data: reservations = [] } = useQuery({ queryKey: ['reservations', date], queryFn: () => getReservations(date), enabled: !!date });
-  const { data: myReservationList = [] } = useQuery({ queryKey: ['myReservations'], queryFn: getMyReservations });
+  const { data: rooms = [] } = useQuery(roomQueries.all());
+  const { data: reservations = [] } = useQuery({ ...reservationQueries.byDate(date), enabled: !!date });
+  const { data: myReservationList = [] } = useQuery(myReservationQueries.all());
 
   const cancelMutation = useMutation({
     mutationFn: (id: string) => cancelReservation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reservations'] });
-      queryClient.invalidateQueries({ queryKey: ['myReservations'] });
+      queryClient.invalidateQueries(reservationQueries.all());
+      queryClient.invalidateQueries({ queryKey: myReservationQueries.all().queryKey });
     },
   });
 
