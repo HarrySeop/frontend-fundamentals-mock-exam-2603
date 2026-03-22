@@ -1,12 +1,11 @@
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { ErrorBoundary } from '@suspensive/react';
 import { Top, Spacing, Border, Button, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { roomQueries, reservationQueries, myReservationQueries } from 'constants/queryKeys';
-import { useCancelReservation } from './hooks/useCancelReservation';
 import { formatDate } from 'utils/date';
+import { useCancelReservation } from './hooks/useCancelReservation';
 import { Timeline } from './components/Timeline';
 import { MyReservationList } from './components/MyReservationList';
 
@@ -25,10 +24,6 @@ export function ReservationStatusPage() {
       window.history.replaceState({}, '');
     }
   }, [locationState]);
-
-  const { data: rooms = [] } = useQuery(roomQueries.all());
-  const { data: reservations = [] } = useQuery({ ...reservationQueries.byDate(date), enabled: !!date });
-  const { data: myReservationList = [] } = useQuery(myReservationQueries.all());
 
   const cancelMutation = useCancelReservation();
 
@@ -82,7 +77,11 @@ export function ReservationStatusPage() {
           예약 현황
         </Text>
         <Spacing size={16} />
-        <Timeline rooms={rooms} reservations={reservations} />
+        <ErrorBoundary resetKeys={[date]} fallback={({ reset }) => <Timeline.Error resetErrorBoundary={reset} />}>
+          <Suspense fallback={<Timeline.Loading />}>
+            <Timeline date={date} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       <Spacing size={24} />
@@ -113,11 +112,11 @@ export function ReservationStatusPage() {
 
       {/* 내 예약 목록 */}
       <div css={css`padding: 0 24px;`}>
-        <MyReservationList
-          reservations={myReservationList}
-          rooms={rooms}
-          onCancel={handleCancel}
-        />
+        <ErrorBoundary fallback={({ reset }) => <MyReservationList.Error resetErrorBoundary={reset} />}>
+          <Suspense fallback={<MyReservationList.Loading />}>
+            <MyReservationList onCancel={handleCancel} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       <Spacing size={24} />

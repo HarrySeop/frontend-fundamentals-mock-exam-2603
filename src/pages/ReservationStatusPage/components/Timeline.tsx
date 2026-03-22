@@ -1,22 +1,30 @@
 import { css } from '@emotion/react';
 import { useState } from 'react';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { Text, Button } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS } from 'constants/equipment';
 import { HOUR_LABELS, TIME_RANGE } from 'constants/time';
+import { roomQueries, reservationQueries } from 'constants/queryKeys';
 import { timeToMinutes } from 'utils/time';
-import type { Room, Reservation } from '_tosslib/server/types';
 
 const TIMELINE_START_MINUTES = timeToMinutes(TIME_RANGE.START);
 const TIMELINE_END_MINUTES = timeToMinutes(TIME_RANGE.END);
 const TOTAL_MINUTES = TIMELINE_END_MINUTES - TIMELINE_START_MINUTES;
 
 interface TimelineProps {
-  rooms: Room[];
-  reservations: Reservation[];
+  date: string;
 }
 
-export function Timeline({ rooms, reservations }: TimelineProps) {
+export function Timeline({ date }: TimelineProps) {
+  const [{ data: rooms }, { data: reservations }] = useSuspenseQueries({
+    queries: [
+      roomQueries.all(),
+      date
+        ? reservationQueries.byDate(date)
+        : { queryKey: ['reservations', ''] as const, queryFn: () => Promise.resolve([]) },
+    ],
+  });
   const [activeReservation, setActiveReservation] = useState<string | null>(null);
 
   return (

@@ -1,16 +1,18 @@
 import { css } from '@emotion/react';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { Button, Text, ListRow, Spacing } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS } from 'constants/equipment';
-import type { Room, Reservation } from '_tosslib/server/types';
+import { roomQueries, myReservationQueries } from 'constants/queryKeys';
 
 interface MyReservationListProps {
-  reservations: Reservation[];
-  rooms: Room[];
   onCancel: (id: string) => void;
 }
 
-export function MyReservationList({ reservations, rooms, onCancel }: MyReservationListProps) {
+export function MyReservationList({ onCancel }: MyReservationListProps) {
+  const [{ data: rooms }, { data: reservations }] = useSuspenseQueries({
+    queries: [roomQueries.all(), myReservationQueries.all()],
+  });
   const getRoomName = (roomId: string) => rooms.find(r => r.id === roomId)?.name ?? roomId;
 
   return (
