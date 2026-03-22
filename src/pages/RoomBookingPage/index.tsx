@@ -8,14 +8,8 @@ import { getRooms, getReservations, createReservation } from 'pages/remotes';
 import { EQUIPMENT_LABELS, EQUIPMENT_LIST } from 'constants/equipment';
 import type { Equipment } from '_tosslib/server/types';
 import { START_TIME_OPTIONS, END_TIME_OPTIONS } from 'constants/time';
+import { formatDate } from 'utils/date';
 import axios from 'axios';
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
 
 export function RoomBookingPage() {
   const navigate = useNavigate();

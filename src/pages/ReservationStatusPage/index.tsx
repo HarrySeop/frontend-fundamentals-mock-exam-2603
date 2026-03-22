@@ -7,23 +7,13 @@ import { colors } from '_tosslib/constants/colors';
 import { getRooms, getReservations, getMyReservations, cancelReservation } from 'pages/remotes';
 import { EQUIPMENT_LABELS } from 'constants/equipment';
 import type { Equipment } from '_tosslib/server/types';
-import { HOUR_LABELS } from 'constants/time';
+import { HOUR_LABELS, TIME_RANGE } from 'constants/time';
+import { formatDate } from 'utils/date';
+import { timeToMinutes } from 'utils/time';
 
-const TIMELINE_START = 9;
-const TIMELINE_END = 20;
-const TOTAL_MINUTES = (TIMELINE_END - TIMELINE_START) * 60;
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number);
-  return (h - TIMELINE_START) * 60 + m;
-}
+const TIMELINE_START_MINUTES = timeToMinutes(TIME_RANGE.START);
+const TIMELINE_END_MINUTES = timeToMinutes(TIME_RANGE.END);
+const TOTAL_MINUTES = TIMELINE_END_MINUTES - TIMELINE_START_MINUTES;
 
 export function ReservationStatusPage() {
   const navigate = useNavigate();
@@ -115,7 +105,7 @@ export function ReservationStatusPage() {
             <div css={css`width: 80px; flex-shrink: 0; padding-right: 8px;`} />
             <div css={css`flex: 1; position: relative; height: 18px;`}>
               {HOUR_LABELS.map(t => {
-                const left = (timeToMinutes(t) / TOTAL_MINUTES) * 100;
+                const left = ((timeToMinutes(t) - TIMELINE_START_MINUTES) / TOTAL_MINUTES) * 100;
                 return (
                   <Text
                     key={t}
@@ -151,7 +141,7 @@ export function ReservationStatusPage() {
                 </div>
                 <div css={css`flex: 1; height: 24px; background: ${colors.white}; border-radius: 6px; position: relative; overflow: visible;`}>
                   {roomReservations.map((res: { id: string; start: string; end: string; attendees: number; equipment: string[] }) => {
-                    const left = (timeToMinutes(res.start) / TOTAL_MINUTES) * 100;
+                    const left = ((timeToMinutes(res.start) - TIMELINE_START_MINUTES) / TOTAL_MINUTES) * 100;
                     const width = ((timeToMinutes(res.end) - timeToMinutes(res.start)) / TOTAL_MINUTES) * 100;
                     const isActive = activeReservation === res.id;
                     return (
