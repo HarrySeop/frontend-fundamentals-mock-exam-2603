@@ -37,22 +37,7 @@ export function RoomBookingPage() {
 
       <Spacing size={24} />
 
-      <FilterPanel
-        date={filter.date}
-        startTime={filter.startTime}
-        endTime={filter.endTime}
-        attendees={filter.attendees}
-        equipment={filter.equipment}
-        preferredFloor={filter.preferredFloor}
-        floors={floors}
-        validationError={filter.validationError}
-        onDateChange={filter.setDate}
-        onStartTimeChange={filter.setStartTime}
-        onEndTimeChange={filter.setEndTime}
-        onAttendeesChange={filter.setAttendees}
-        onEquipmentChange={filter.setEquipment}
-        onPreferredFloorChange={filter.setPreferredFloor}
-      />
+      <FilterPanel filter={filter} floors={floors} />
 
       <Spacing size={24} />
       <Border size={8} />

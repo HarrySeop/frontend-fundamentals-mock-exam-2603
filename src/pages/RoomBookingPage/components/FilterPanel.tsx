@@ -4,31 +4,19 @@ import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS, EQUIPMENT_LIST } from 'constants/equipment';
 import { START_TIME_OPTIONS, END_TIME_OPTIONS } from 'constants/time';
 import { formatDate } from 'utils/date';
-import type { Equipment } from '_tosslib/server/types';
+import type { useBookingFilter } from '../hooks/useBookingFilter';
 
 interface FilterPanelProps {
-  date: string;
-  startTime: string;
-  endTime: string;
-  attendees: number;
-  equipment: Equipment[];
-  preferredFloor: number | null;
+  filter: ReturnType<typeof useBookingFilter>;
   floors: number[];
-  validationError: string | null;
-  onDateChange: (value: string) => void;
-  onStartTimeChange: (value: string) => void;
-  onEndTimeChange: (value: string) => void;
-  onAttendeesChange: (value: number) => void;
-  onEquipmentChange: (value: Equipment[]) => void;
-  onPreferredFloorChange: (value: number | null) => void;
 }
 
-export function FilterPanel({
-  date, startTime, endTime, attendees, equipment, preferredFloor, floors,
-  validationError,
-  onDateChange, onStartTimeChange, onEndTimeChange, onAttendeesChange,
-  onEquipmentChange, onPreferredFloorChange,
-}: FilterPanelProps) {
+export function FilterPanel({ filter, floors }: FilterPanelProps) {
+  const {
+    date, setDate, startTime, setStartTime, endTime, setEndTime,
+    attendees, setAttendees, equipment, setEquipment,
+    preferredFloor, setPreferredFloor, validationError,
+  } = filter;
   return (
     <>
       <div css={css`padding: 0 24px;`}>
@@ -44,7 +32,7 @@ export function FilterPanel({
             type="date"
             value={date}
             min={formatDate(new Date())}
-            onChange={e => onDateChange(e.target.value)}
+            onChange={e => setDate(e.target.value)}
             aria-label="날짜"
             css={css`
               box-sizing: border-box; font-size: 16px; font-weight: 500; line-height: 1.5; height: 48px;
@@ -62,7 +50,7 @@ export function FilterPanel({
             <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>시작 시간</Text>
             <Select
               value={startTime}
-              onChange={e => onStartTimeChange(e.target.value)}
+              onChange={e => setStartTime(e.target.value)}
               aria-label="시작 시간"
             >
               <option value="">선택</option>
@@ -75,7 +63,7 @@ export function FilterPanel({
             <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>종료 시간</Text>
             <Select
               value={endTime}
-              onChange={e => onEndTimeChange(e.target.value)}
+              onChange={e => setEndTime(e.target.value)}
               aria-label="종료 시간"
             >
               <option value="">선택</option>
@@ -95,7 +83,7 @@ export function FilterPanel({
               type="number"
               min={1}
               value={attendees}
-              onChange={e => onAttendeesChange(Math.max(1, Number(e.target.value)))}
+              onChange={e => setAttendees(Math.max(1, Number(e.target.value)))}
               aria-label="참석 인원"
               css={css`
                 box-sizing: border-box; font-size: 16px; font-weight: 500; line-height: 1.5; height: 48px;
@@ -111,7 +99,7 @@ export function FilterPanel({
               value={preferredFloor ?? ''}
               onChange={e => {
                 const val = e.target.value;
-                onPreferredFloorChange(val === '' ? null : Number(val));
+                setPreferredFloor(val === '' ? null : Number(val));
               }}
               aria-label="선호 층"
             >
@@ -137,7 +125,7 @@ export function FilterPanel({
                   type="button"
                   onClick={() => {
                     const next = selected ? equipment.filter(e => e !== eq) : [...equipment, eq];
-                    onEquipmentChange(next);
+                    setEquipment(next);
                   }}
                   aria-label={EQUIPMENT_LABELS[eq]}
                   aria-pressed={selected}
