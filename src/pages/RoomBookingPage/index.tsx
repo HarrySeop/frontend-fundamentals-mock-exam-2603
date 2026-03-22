@@ -5,24 +5,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Top, Spacing, Border, Button, Text, Select, ListRow } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { getRooms, getReservations, createReservation } from 'pages/remotes';
+import { EQUIPMENT_LABELS, EQUIPMENT_LIST } from 'constants/equipment';
+import type { Equipment } from '_tosslib/server/types';
+import { START_TIME_OPTIONS, END_TIME_OPTIONS } from 'constants/time';
 import axios from 'axios';
-
-const EQUIPMENT_LABELS: Record<string, string> = {
-  tv: 'TV',
-  whiteboard: '화이트보드',
-  video: '화상장비',
-  speaker: '스피커',
-};
-
-const ALL_EQUIPMENT = ['tv', 'whiteboard', 'video', 'speaker'];
-
-const TIME_SLOTS: string[] = [];
-for (let h = 9; h <= 20; h++) {
-  TIME_SLOTS.push(`${String(h).padStart(2, '0')}:00`);
-  if (h < 20) {
-    TIME_SLOTS.push(`${String(h).padStart(2, '0')}:30`);
-  }
-}
 
 function formatDate(date: Date): string {
   const y = date.getFullYear();
@@ -223,7 +209,7 @@ export function RoomBookingPage() {
               aria-label="시작 시간"
             >
               <option value="">선택</option>
-              {TIME_SLOTS.slice(0, -1).map(t => (
+              {START_TIME_OPTIONS.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
@@ -236,7 +222,7 @@ export function RoomBookingPage() {
               aria-label="종료 시간"
             >
               <option value="">선택</option>
-              {TIME_SLOTS.slice(1).map(t => (
+              {END_TIME_OPTIONS.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
@@ -287,7 +273,7 @@ export function RoomBookingPage() {
           <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>필요 장비</Text>
           <Spacing size={8} />
           <div css={css`display: flex; gap: 8px; flex-wrap: wrap;`}>
-            {ALL_EQUIPMENT.map(eq => {
+            {EQUIPMENT_LIST.map(eq => {
               const selected = equipment.includes(eq);
               return (
                 <button
@@ -371,7 +357,7 @@ export function RoomBookingPage() {
                         <ListRow.Text2Rows
                           top={room.name}
                           topProps={{ typography: 't6', fontWeight: 'bold', color: colors.grey900 }}
-                          bottom={`${room.floor}층 · ${room.capacity}명 · ${room.equipment.map((e: string) => EQUIPMENT_LABELS[e]).join(', ')}`}
+                          bottom={`${room.floor}층 · ${room.capacity}명 · ${room.equipment.map((e: string) => EQUIPMENT_LABELS[e as Equipment]).join(', ')}`}
                           bottomProps={{ typography: 't7', color: colors.grey600 }}
                         />
                       }
