@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { getRooms, getReservations, getMyReservations } from 'pages/remotes';
+import type { Reservation } from '_tosslib/server/types';
 
 export const roomQueries = {
   all: () => queryOptions({ queryKey: ['rooms'] as const, queryFn: getRooms }),
@@ -12,6 +13,12 @@ export const reservationQueries = {
     queryOptions({
       queryKey: ['reservations', date] as const,
       queryFn: () => getReservations(date),
+    }),
+  /** 빈 날짜용 — useSuspenseQueries에서 enabled 대체 */
+  empty: () =>
+    queryOptions({
+      queryKey: ['reservations', ''] as const,
+      queryFn: () => Promise.resolve([] as Reservation[]),
     }),
 };
 

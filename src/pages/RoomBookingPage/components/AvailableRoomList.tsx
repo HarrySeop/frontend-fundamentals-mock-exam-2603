@@ -9,7 +9,7 @@ import { EQUIPMENT_LABELS } from 'constants/equipment';
 import { roomQueries, reservationQueries, myReservationQueries } from 'constants/queryKeys';
 import { createReservation } from 'pages/remotes';
 import { filterAvailableRooms } from '../utils/filterRooms';
-import type { Equipment, Room } from '_tosslib/server/types';
+import type { Equipment } from '_tosslib/server/types';
 import axios from 'axios';
 
 interface AvailableRoomListProps {
@@ -32,9 +32,7 @@ function AvailableRoomListContent({
   const [{ data: rooms }, { data: reservations }] = useSuspenseQueries({
     queries: [
       roomQueries.all(),
-      date
-        ? reservationQueries.byDate(date)
-        : { queryKey: ['reservations', ''] as const, queryFn: () => Promise.resolve([]) },
+      date ? reservationQueries.byDate(date) : reservationQueries.empty(),
     ],
   });
 
@@ -47,7 +45,7 @@ function AvailableRoomListContent({
     },
   });
 
-  const availableRooms = filterAvailableRooms(rooms as Room[], reservations, {
+  const availableRooms = filterAvailableRooms(rooms, reservations, {
     attendees, equipment, preferredFloor, date, startTime, endTime,
   });
 
