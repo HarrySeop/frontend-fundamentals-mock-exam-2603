@@ -1013,18 +1013,17 @@
   resolved "https://registry.yarnpkg.com/@standard-schema/spec/-/spec-1.1.0.tgz#a79b55dbaf8604812f52d140b2c9ab41bc150bb8"
   integrity sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==
 
-"@tanstack/query-core@4.43.0":
-  version "4.43.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.43.0.tgz#e72d9dbab4b1207efe740363b68375b4bdaff1c2"
-  integrity sha512-m1QeUUIpNXDYxmfuuWNFZLky0EwVmbE0hj8ulZ2nIGA1183raJgDCn0IKlxug80NotRqzodxAaoYTKHbE1/P/Q==
+"@tanstack/query-core@5.94.5":
+  version "5.94.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.94.5.tgz#4857cb0b0add6089ad69a894afde019ad7aa17d4"
+  integrity sha512-Vx1JJiBURW/wdNGP45afjrqn0LfxYwL7K/bSrQvNRtyLGF1bxQPgUXCpzscG29e+UeFOh9hz1KOVala0N+bZiA==
 
-"@tanstack/react-query@^4.43.0":
-  version "4.43.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.43.0.tgz#f993211864c2070ba7f764971901bd3e60c886d1"
-  integrity sha512-Lj8luFKHQL27oZbw5T8xdTbsfAPp2+bCtSCa2bAVvIwnvNfRP0hpB1GxfKFgCktat8lPcYBHAu8eMTXzz2sQtQ==
+"@tanstack/react-query@^5":
+  version "5.94.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.94.5.tgz#69f45ecae33e775e71fab212ff5aa72b570fd9da"
+  integrity sha512-1wmrxKFkor+q8l+ygdHmv0Sq5g84Q3p4xvuJ7AdSIAhQQ7udOt+ZSZ19g1Jea3mHqtlTslLGJsmC4vHFgP0P3A==
   dependencies:
-    "@tanstack/query-core" "4.43.0"
-    use-sync-external-store "^1.6.0"
+    "@tanstack/query-core" "5.94.5"
 
 "@testing-library/dom@^9.0.0":
   version "9.3.4"
@@ -5021,11 +5020,6 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
-
-use-sync-external-store@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz#b174bfa65cb2b526732d9f2ac0a408027876f32d"
-  integrity sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
