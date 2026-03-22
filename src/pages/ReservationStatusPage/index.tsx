@@ -125,7 +125,7 @@ export function ReservationStatusPage() {
 
       {/* 예약하기 버튼 */}
       <div css={css`padding: 0 24px;`}>
-        <Button display="full" onClick={() => navigate('/booking')}>
+        <Button display="full" onClick={() => navigate(`/booking?date=${date}`)}>
           예약하기
         </Button>
       </div>
