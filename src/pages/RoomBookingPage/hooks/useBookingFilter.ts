@@ -3,11 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { Equipment } from '_tosslib/server/types';
 import { formatDate } from 'utils/date';
 
-interface UseBookingFilterOptions {
-  onFilterChange?: () => void;
-}
-
-export function useBookingFilter({ onFilterChange }: UseBookingFilterOptions = {}) {
+export function useBookingFilter() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [date, setDate] = useState(searchParams.get('date') || formatDate(new Date()));
@@ -43,18 +39,13 @@ export function useBookingFilter({ onFilterChange }: UseBookingFilterOptions = {
   }
   const isFilterComplete = hasTimeInputs && !validationError;
 
-  const wrapSetter = <T,>(setter: React.Dispatch<React.SetStateAction<T>>) => (value: T) => {
-    setter(value);
-    onFilterChange?.();
-  };
-
   return {
-    date, setDate: wrapSetter(setDate),
-    startTime, setStartTime: wrapSetter(setStartTime),
-    endTime, setEndTime: wrapSetter(setEndTime),
-    attendees, setAttendees: wrapSetter(setAttendees),
-    equipment, setEquipment: wrapSetter(setEquipment),
-    preferredFloor, setPreferredFloor: wrapSetter(setPreferredFloor),
+    date, setDate,
+    startTime, setStartTime,
+    endTime, setEndTime,
+    attendees, setAttendees,
+    equipment, setEquipment,
+    preferredFloor, setPreferredFloor,
     validationError,
     isFilterComplete,
   };
