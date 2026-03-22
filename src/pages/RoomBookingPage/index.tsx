@@ -21,8 +21,8 @@ export function RoomBookingPage() {
   const [startTime, setStartTime] = useState(searchParams.get('startTime') || '');
   const [endTime, setEndTime] = useState(searchParams.get('endTime') || '');
   const [attendees, setAttendees] = useState(Number(searchParams.get('attendees')) || 1);
-  const [equipment, setEquipment] = useState<string[]>(
-    searchParams.get('equipment') ? searchParams.get('equipment')!.split(',').filter(Boolean) : []
+  const [equipment, setEquipment] = useState<Equipment[]>(
+    searchParams.get('equipment') ? searchParams.get('equipment')!.split(',').filter(Boolean) as Equipment[] : []
   );
   const [preferredFloor, setPreferredFloor] = useState<number | null>(
     searchParams.get('floor') ? Number(searchParams.get('floor')) : null
@@ -46,7 +46,7 @@ export function RoomBookingPage() {
   const { data: reservations = [] } = useQuery({ ...reservationQueries.byDate(date), enabled: !!date });
 
   const createMutation = useMutation({
-    mutationFn: (data: { roomId: string; date: string; start: string; end: string; attendees: number; equipment: string[] }) =>
+    mutationFn: (data: { roomId: string; date: string; start: string; end: string; attendees: number; equipment: Equipment[] }) =>
       createReservation(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: reservationQueries.byDate(variables.date).queryKey });
@@ -73,22 +73,21 @@ export function RoomBookingPage() {
   const isFilterComplete = hasTimeInputs && !validationError;
 
   // 필터링
-  const floors = [...new Set(rooms.map((r: { floor: number }) => r.floor))].sort((a: number, b: number) => a - b);
+  const floors = [...new Set(rooms.map(r => r.floor))].sort((a, b) => a - b);
 
   const availableRooms = isFilterComplete
     ? rooms
-        .filter((room: { id: string; capacity: number; equipment: string[]; floor: number }) => {
+        .filter(room => {
           if (room.capacity < attendees) return false;
           if (!equipment.every(eq => room.equipment.includes(eq))) return false;
           if (preferredFloor !== null && room.floor !== preferredFloor) return false;
           const hasConflict = reservations.some(
-            (r: { roomId: string; date: string; start: string; end: string }) =>
-              r.roomId === room.id && r.date === date && r.start < endTime && r.end > startTime
+            r => r.roomId === room.id && r.date === date && r.start < endTime && r.end > startTime
           );
           if (hasConflict) return false;
           return true;
         })
-        .sort((a: { floor: number; name: string }, b: { floor: number; name: string }) => {
+        .sort((a, b) => {
           if (a.floor !== b.floor) return a.floor - b.floor;
           return a.name.localeCompare(b.name);
         })
@@ -330,7 +329,7 @@ export function RoomBookingPage() {
             </div>
           ) : (
             <div css={css`display: flex; flex-direction: column; gap: 10px;`}>
-              {availableRooms.map((room: { id: string; name: string; floor: number; capacity: number; equipment: string[] }) => {
+              {availableRooms.map(room => {
                 const isSelected = selectedRoomId === room.id;
                 return (
                   <div
@@ -352,7 +351,7 @@ export function RoomBookingPage() {
                         <ListRow.Text2Rows
                           top={room.name}
                           topProps={{ typography: 't6', fontWeight: 'bold', color: colors.grey900 }}
-                          bottom={`${room.floor}층 · ${room.capacity}명 · ${room.equipment.map((e: string) => EQUIPMENT_LABELS[e as Equipment]).join(', ')}`}
+                          bottom={`${room.floor}층 · ${room.capacity}명 · ${room.equipment.map(e => EQUIPMENT_LABELS[e]).join(', ')}`}
                           bottomProps={{ typography: 't7', color: colors.grey600 }}
                         />
                       }
