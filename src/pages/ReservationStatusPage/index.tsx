@@ -1,11 +1,11 @@
 import { css } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Top, Spacing, Border, Button, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
-import { cancelReservation } from 'pages/remotes';
 import { roomQueries, reservationQueries, myReservationQueries } from 'constants/queryKeys';
+import { useCancelReservation } from './hooks/useCancelReservation';
 import { formatDate } from 'utils/date';
 import { Timeline } from './components/Timeline';
 import { MyReservationList } from './components/MyReservationList';
@@ -13,7 +13,6 @@ import { MyReservationList } from './components/MyReservationList';
 export function ReservationStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const queryClient = useQueryClient();
   const [date, setDate] = useState(formatDate(new Date()));
 
   const locationState = location.state as { message?: string } | null;
@@ -31,13 +30,7 @@ export function ReservationStatusPage() {
   const { data: reservations = [] } = useQuery({ ...reservationQueries.byDate(date), enabled: !!date });
   const { data: myReservationList = [] } = useQuery(myReservationQueries.all());
 
-  const cancelMutation = useMutation({
-    mutationFn: (id: string) => cancelReservation(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(reservationQueries.all());
-      queryClient.invalidateQueries({ queryKey: myReservationQueries.all().queryKey });
-    },
-  });
+  const cancelMutation = useCancelReservation();
 
   const handleCancel = async (id: string) => {
     try {
