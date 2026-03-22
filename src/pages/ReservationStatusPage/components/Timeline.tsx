@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSuspenseQueries } from '@tanstack/react-query';
 import { Text, Button } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
@@ -16,7 +17,14 @@ interface TimelineProps {
   date: string;
 }
 
+function minutesToTime(minutes: number): string {
+  const h = String(Math.floor(minutes / 60)).padStart(2, '0');
+  const m = String(minutes % 60).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
 export function Timeline({ date }: TimelineProps) {
+  const navigate = useNavigate();
   const [{ data: rooms }, { data: reservations }] = useSuspenseQueries({
     queries: [
       roomQueries.all(),
@@ -26,6 +34,14 @@ export function Timeline({ date }: TimelineProps) {
     ],
   });
   const [activeReservation, setActiveReservation] = useState<string | null>(null);
+
+  const handleSlotClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    const minutes = TIMELINE_START_MINUTES + ratio * TOTAL_MINUTES;
+    const snapped = Math.max(Math.floor(minutes / 30) * 30, TIMELINE_START_MINUTES);
+    navigate(`/booking?date=${date}&startTime=${minutesToTime(snapped)}`);
+  };
 
   return (
     <div css={css`background: ${colors.grey50}; border-radius: 14px; padding: 16px;`}>
@@ -68,7 +84,12 @@ export function Timeline({ date }: TimelineProps) {
                 {room.name}
               </Text>
             </div>
-            <div css={css`flex: 1; height: 24px; background: ${colors.white}; border-radius: 6px; position: relative; overflow: visible;`}>
+            <div
+              role="button"
+              aria-label={`${room.name} 빈 시간 예약`}
+              onClick={handleSlotClick}
+              css={css`flex: 1; height: 24px; background: ${colors.white}; border-radius: 6px; position: relative; overflow: visible; cursor: pointer;`}
+            >
               {roomReservations.map(res => {
                 const left = ((timeToMinutes(res.start) - TIMELINE_START_MINUTES) / TOTAL_MINUTES) * 100;
                 const width = ((timeToMinutes(res.end) - timeToMinutes(res.start)) / TOTAL_MINUTES) * 100;
@@ -78,7 +99,7 @@ export function Timeline({ date }: TimelineProps) {
                     <div
                       role="button"
                       aria-label={`${room.name} ${res.start}-${res.end} 예약 상세`}
-                      onClick={() => setActiveReservation(isActive ? null : res.id)}
+                      onClick={(e) => { e.stopPropagation(); setActiveReservation(isActive ? null : res.id); }}
                       css={css`
                         width: 100%; height: 100%; background: ${colors.blue400}; border-radius: 4px;
                         opacity: ${isActive ? 1 : 0.75}; cursor: pointer; transition: opacity 0.15s;
