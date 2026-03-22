@@ -7,7 +7,7 @@ import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS } from 'constants/equipment';
 import { HOUR_LABELS, TIME_RANGE } from 'constants/time';
 import { roomQueries, reservationQueries } from 'constants/queryKeys';
-import { timeToMinutes } from 'utils/time';
+import { timeToMinutes, minutesToTime } from 'utils/time';
 
 const TIMELINE_START_MINUTES = timeToMinutes(TIME_RANGE.START);
 const TIMELINE_END_MINUTES = timeToMinutes(TIME_RANGE.END);
@@ -17,20 +17,12 @@ interface TimelineProps {
   date: string;
 }
 
-function minutesToTime(minutes: number): string {
-  const h = String(Math.floor(minutes / 60)).padStart(2, '0');
-  const m = String(minutes % 60).padStart(2, '0');
-  return `${h}:${m}`;
-}
-
 export function Timeline({ date }: TimelineProps) {
   const navigate = useNavigate();
   const [{ data: rooms }, { data: reservations }] = useSuspenseQueries({
     queries: [
       roomQueries.all(),
-      date
-        ? reservationQueries.byDate(date)
-        : { queryKey: ['reservations', ''] as const, queryFn: () => Promise.resolve([]) },
+      date ? reservationQueries.byDate(date) : reservationQueries.empty(),
     ],
   });
   const [activeReservation, setActiveReservation] = useState<string | null>(null);
